@@ -20,8 +20,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import BROS_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+BROS_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "jinho8345/bros-base-uncased": "https://huggingface.co/jinho8345/bros-base-uncased/blob/main/config.json",
+    "jinho8345/bros-large-uncased": "https://huggingface.co/jinho8345/bros-large-uncased/blob/main/config.json",
+}
 
 
 class BrosConfig(PretrainedConfig):

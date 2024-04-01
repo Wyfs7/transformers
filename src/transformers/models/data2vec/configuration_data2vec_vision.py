@@ -25,8 +25,11 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import DATA2VEC_VISION_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+DATA2VEC_VISION_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/data2vec-vision-base-ft": (
+        "https://huggingface.co/facebook/data2vec-vision-base-ft/resolve/main/config.json"
+    ),
+}
 
 
 class Data2VecVisionConfig(PretrainedConfig):

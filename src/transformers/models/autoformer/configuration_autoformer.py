@@ -22,8 +22,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import AUTOFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+AUTOFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "huggingface/autoformer-tourism-monthly": "https://huggingface.co/huggingface/autoformer-tourism-monthly/resolve/main/config.json",
+}
 
 
 class AutoformerConfig(PretrainedConfig):

@@ -52,7 +52,10 @@ _IMAGE_CLASS_CHECKPOINT = "MBZUAI/swiftformer-xs"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tabby, tabby cat"
 
 
-from ..deprecated._archive_maps import SWIFTFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+SWIFTFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "MBZUAI/swiftformer-xs",
+    # See all SwiftFormer models at https://huggingface.co/models?filter=swiftformer
+]
 
 
 class SwiftFormerPatchEmbedding(nn.Module):

@@ -48,8 +48,10 @@ logger = logging.get_logger(__name__)
 _CONFIG_FOR_DOC = "ViltConfig"
 _CHECKPOINT_FOR_DOC = "dandelin/vilt-b32-mlm"
 
-
-from ..deprecated._archive_maps import VILT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+VILT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "dandelin/vilt-b32-mlm",
+    # See all ViLT models at https://huggingface.co/models?filter=vilt
+]
 
 
 @dataclass
@@ -315,8 +317,7 @@ class ViltPatchEmbeddings(nn.Module):
             raise ValueError(
                 "Make sure that the channel dimension of the pixel values match with the one set in the configuration."
             )
-        target_dtype = self.projection.weight.dtype
-        x = self.projection(pixel_values.to(dtype=target_dtype))
+        x = self.projection(pixel_values)
         return x
 
 

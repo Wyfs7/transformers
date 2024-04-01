@@ -23,8 +23,14 @@ from ...utils import TensorType, is_torch_available, logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import LAYOUTLM_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+LAYOUTLM_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/layoutlm-base-uncased": (
+        "https://huggingface.co/microsoft/layoutlm-base-uncased/resolve/main/config.json"
+    ),
+    "microsoft/layoutlm-large-uncased": (
+        "https://huggingface.co/microsoft/layoutlm-large-uncased/resolve/main/config.json"
+    ),
+}
 
 
 class LayoutLMConfig(PretrainedConfig):

@@ -25,7 +25,7 @@ from ..utils import (
     is_vision_available,
     logging,
 )
-from .base import ChunkPipeline, build_pipeline_init_args
+from .base import PIPELINE_INIT_ARGS, ChunkPipeline
 from .question_answering import select_starts_ends
 
 
@@ -98,7 +98,7 @@ class ModelType(ExplicitEnum):
     VisionEncoderDecoder = "vision_encoder_decoder"
 
 
-@add_end_docstrings(build_pipeline_init_args(has_image_processor=True, has_tokenizer=True))
+@add_end_docstrings(PIPELINE_INIT_ARGS)
 class DocumentQuestionAnsweringPipeline(ChunkPipeline):
     # TODO: Update task_summary docs to include an example with document QA and then update the first sentence
     """
@@ -419,14 +419,14 @@ class DocumentQuestionAnsweringPipeline(ChunkPipeline):
                     "is_last": span_idx == num_spans - 1,
                 }
 
-    def _forward(self, model_inputs, **generate_kwargs):
+    def _forward(self, model_inputs):
         p_mask = model_inputs.pop("p_mask", None)
         word_ids = model_inputs.pop("word_ids", None)
         words = model_inputs.pop("words", None)
         is_last = model_inputs.pop("is_last", False)
 
         if self.model_type == ModelType.VisionEncoderDecoder:
-            model_outputs = self.model.generate(**model_inputs, **generate_kwargs)
+            model_outputs = self.model.generate(**model_inputs)
         else:
             model_outputs = self.model(**model_inputs)
 

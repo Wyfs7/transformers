@@ -21,8 +21,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import VITS_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+VITS_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/mms-tts-eng": "https://huggingface.co/facebook/mms-tts-eng/resolve/main/config.json",
+}
 
 
 class VitsConfig(PretrainedConfig):

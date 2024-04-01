@@ -26,8 +26,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import EFFICIENTNET_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+EFFICIENTNET_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "google/efficientnet-b7": "https://huggingface.co/google/efficientnet-b7/resolve/main/config.json",
+}
 
 
 class EfficientNetConfig(PretrainedConfig):

@@ -21,8 +21,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import POP2PIANO_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+POP2PIANO_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "sweetcocoa/pop2piano": "https://huggingface.co/sweetcocoa/pop2piano/blob/main/config.json"
+}
 
 
 class Pop2PianoConfig(PretrainedConfig):

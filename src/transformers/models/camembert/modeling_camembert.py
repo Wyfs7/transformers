@@ -48,12 +48,15 @@ from .configuration_camembert import CamembertConfig
 
 logger = logging.get_logger(__name__)
 
-_CHECKPOINT_FOR_DOC = "almanach/camembert-base"
+_CHECKPOINT_FOR_DOC = "camembert-base"
 _CONFIG_FOR_DOC = "CamembertConfig"
 
-
-from ..deprecated._archive_maps import CAMEMBERT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
-
+CAMEMBERT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "camembert-base",
+    "Musixmatch/umberto-commoncrawl-cased-v1",
+    "Musixmatch/umberto-wikipedia-uncased-v1",
+    # See all CamemBERT models at https://huggingface.co/models?filter=camembert
+]
 
 CAMEMBERT_START_DOCSTRING = r"""
 
@@ -1394,7 +1397,7 @@ class CamembertForQuestionAnswering(CamembertPreTrainedModel):
 @add_start_docstrings(
     """CamemBERT Model with a `language modeling` head on top for CLM fine-tuning.""", CAMEMBERT_START_DOCSTRING
 )
-# Copied from transformers.models.roberta.modeling_roberta.RobertaForCausalLM with Roberta->Camembert, ROBERTA->CAMEMBERT, FacebookAI/roberta-base->almanach/camembert-base
+# Copied from transformers.models.roberta.modeling_roberta.RobertaForCausalLM with Roberta->Camembert, ROBERTA->CAMEMBERT, roberta-base->camembert-base
 class CamembertForCausalLM(CamembertPreTrainedModel):
     _tied_weights_keys = ["lm_head.decoder.weight", "lm_head.decoder.bias"]
 
@@ -1468,10 +1471,10 @@ class CamembertForCausalLM(CamembertPreTrainedModel):
         >>> from transformers import AutoTokenizer, CamembertForCausalLM, AutoConfig
         >>> import torch
 
-        >>> tokenizer = AutoTokenizer.from_pretrained("almanach/camembert-base")
-        >>> config = AutoConfig.from_pretrained("almanach/camembert-base")
+        >>> tokenizer = AutoTokenizer.from_pretrained("camembert-base")
+        >>> config = AutoConfig.from_pretrained("camembert-base")
         >>> config.is_decoder = True
-        >>> model = CamembertForCausalLM.from_pretrained("almanach/camembert-base", config=config)
+        >>> model = CamembertForCausalLM.from_pretrained("camembert-base", config=config)
 
         >>> inputs = tokenizer("Hello, my dog is cute", return_tensors="pt")
         >>> outputs = model(**inputs)

@@ -26,8 +26,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import ENCODEC_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+ENCODEC_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/encodec_24khz": "https://huggingface.co/facebook/encodec_24khz/resolve/main/config.json",
+    "facebook/encodec_48khz": "https://huggingface.co/facebook/encodec_48khz/resolve/main/config.json",
+}
 
 
 class EncodecConfig(PretrainedConfig):

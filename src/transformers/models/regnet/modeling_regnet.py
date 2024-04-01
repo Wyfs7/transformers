@@ -46,8 +46,10 @@ _EXPECTED_OUTPUT_SHAPE = [1, 1088, 7, 7]
 _IMAGE_CLASS_CHECKPOINT = "facebook/regnet-y-040"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tabby, tabby cat"
 
-
-from ..deprecated._archive_maps import REGNET_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+REGNET_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "facebook/regnet-y-040",
+    # See all regnet models at https://huggingface.co/models?filter=regnet
+]
 
 
 class RegNetConvLayer(nn.Module):
@@ -293,7 +295,7 @@ class RegNetPreTrainedModel(PreTrainedModel):
 
 REGNET_START_DOCSTRING = r"""
     This model is a PyTorch [torch.nn.Module](https://pytorch.org/docs/stable/nn.html#torch.nn.Module) subclass. Use it
-    as a regular PyTorch Module and refer to the PyTorch documentation for all matters related to general usage and
+    as a regular PyTorch Module and refer to the PyTorch documentation for all matter related to general usage and
     behavior.
 
     Parameters:

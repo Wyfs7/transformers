@@ -47,9 +47,11 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "jinho8345/bros-base-uncased"
 _CONFIG_FOR_DOC = "BrosConfig"
 
-
-from ..deprecated._archive_maps import BROS_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
-
+BROS_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "jinho8345/bros-base-uncased",
+    "jinho8345/bros-large-uncased",
+    # See all Bros models at https://huggingface.co/models?filter=bros
+]
 
 BROS_START_DOCSTRING = r"""
     This model is also a PyTorch [torch.nn.Module](https://pytorch.org/docs/stable/nn.html#torch.nn.Module) subclass.

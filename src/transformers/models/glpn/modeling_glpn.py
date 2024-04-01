@@ -46,8 +46,10 @@ _CONFIG_FOR_DOC = "GLPNConfig"
 _CHECKPOINT_FOR_DOC = "vinvino02/glpn-kitti"
 _EXPECTED_OUTPUT_SHAPE = [1, 512, 15, 20]
 
-
-from ..deprecated._archive_maps import GLPN_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+GLPN_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "vinvino02/glpn-kitti",
+    # See all GLPN models at https://huggingface.co/models?filter=glpn
+]
 
 
 # Copied from transformers.models.beit.modeling_beit.drop_path

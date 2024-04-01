@@ -25,8 +25,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import MPT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+MPT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "mosaicml/mpt-7b": "https://huggingface.co/mosaicml/mpt-7b/resolve/main/config.json",
+}
 
 
 class MptAttentionConfig(PretrainedConfig):

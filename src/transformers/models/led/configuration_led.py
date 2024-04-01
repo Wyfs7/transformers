@@ -22,8 +22,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import LED_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+LED_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "allenai/led-base-16384": "https://huggingface.co/allenai/led-base-16384/resolve/main/config.json",
+    # See all LED models at https://huggingface.co/models?filter=led
+}
 
 
 class LEDConfig(PretrainedConfig):

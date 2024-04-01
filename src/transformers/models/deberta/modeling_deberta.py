@@ -53,7 +53,14 @@ _QA_TARGET_START_INDEX = 12
 _QA_TARGET_END_INDEX = 14
 
 
-from ..deprecated._archive_maps import DEBERTA_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+DEBERTA_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/deberta-base",
+    "microsoft/deberta-large",
+    "microsoft/deberta-xlarge",
+    "microsoft/deberta-base-mnli",
+    "microsoft/deberta-large-mnli",
+    "microsoft/deberta-xlarge-mnli",
+]
 
 
 class ContextPooler(nn.Module):

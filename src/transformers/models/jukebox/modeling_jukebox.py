@@ -33,8 +33,11 @@ from .configuration_jukebox import ATTENTION_PATTERNS, JukeboxConfig, JukeboxPri
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import JUKEBOX_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+JUKEBOX_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "openai/jukebox-1b-lyrics",
+    "openai/jukebox-5b-lyrics",
+    # See all Jukebox models at https://huggingface.co/models?filter=jukebox
+]
 
 
 def filter_logits(logits, top_k=0, top_p=0.0, filter_value=-float("Inf")):

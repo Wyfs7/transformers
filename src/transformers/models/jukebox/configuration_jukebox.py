@@ -23,9 +23,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import JUKEBOX_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
-
+JUKEBOX_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "openai/jukebox-5b-lyrics": "https://huggingface.co/openai/jukebox-5b-lyrics/blob/main/config.json",
+    "openai/jukebox-1b-lyrics": "https://huggingface.co/openai/jukebox-1b-lyrics/blob/main/config.json",
+}
 
 _LARGE_ATTENTION = [
     "block_attn",

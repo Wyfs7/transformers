@@ -23,8 +23,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import PLBART_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+PLBART_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "uclanlp/plbart-base": "https://huggingface.co/uclanlp/plbart-base/resolve/main/config.json",
+    # See all PLBART models at https://huggingface.co/models?filter=plbart
+}
 
 
 class PLBartConfig(PretrainedConfig):

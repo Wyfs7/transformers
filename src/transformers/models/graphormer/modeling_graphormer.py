@@ -37,7 +37,11 @@ _CHECKPOINT_FOR_DOC = "graphormer-base-pcqm4mv1"
 _CONFIG_FOR_DOC = "GraphormerConfig"
 
 
-from ..deprecated._archive_maps import GRAPHORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+GRAPHORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "clefourrier/graphormer-base-pcqm4mv1",
+    "clefourrier/graphormer-base-pcqm4mv2",
+    # See all Graphormer models at https://huggingface.co/models?filter=graphormer
+]
 
 
 def quant_noise(module: nn.Module, p: float, block_size: int):

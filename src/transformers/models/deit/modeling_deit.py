@@ -59,7 +59,10 @@ _IMAGE_CLASS_CHECKPOINT = "facebook/deit-base-distilled-patch16-224"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tabby, tabby cat"
 
 
-from ..deprecated._archive_maps import DEIT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+DEIT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "facebook/deit-base-distilled-patch16-224",
+    # See all DeiT models at https://huggingface.co/models?filter=deit
+]
 
 
 class DeiTEmbeddings(nn.Module):

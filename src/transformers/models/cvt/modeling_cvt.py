@@ -45,7 +45,15 @@ _IMAGE_CLASS_CHECKPOINT = "microsoft/cvt-13"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tabby, tabby cat"
 
 
-from ..deprecated._archive_maps import CVT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+CVT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/cvt-13",
+    "microsoft/cvt-13-384",
+    "microsoft/cvt-13-384-22k",
+    "microsoft/cvt-21",
+    "microsoft/cvt-21-384",
+    "microsoft/cvt-21-384-22k",
+    # See all Cvt models at https://huggingface.co/models?filter=cvt
+]
 
 
 @dataclass
@@ -66,7 +74,7 @@ class BaseModelOutputWithCLSToken(ModelOutput):
 
     last_hidden_state: torch.FloatTensor = None
     cls_token_value: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 
 # Copied from transformers.models.beit.modeling_beit.drop_path

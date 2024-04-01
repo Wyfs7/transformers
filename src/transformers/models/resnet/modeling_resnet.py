@@ -53,8 +53,10 @@ _EXPECTED_OUTPUT_SHAPE = [1, 2048, 7, 7]
 _IMAGE_CLASS_CHECKPOINT = "microsoft/resnet-50"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tiger cat"
 
-
-from ..deprecated._archive_maps import RESNET_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+RESNET_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/resnet-50",
+    # See all resnet models at https://huggingface.co/models?filter=resnet
+]
 
 
 class ResNetConvLayer(nn.Module):

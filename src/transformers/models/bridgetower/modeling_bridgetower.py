@@ -44,8 +44,11 @@ _CONFIG_FOR_DOC = "BridgeTowerConfig"
 _CHECKPOINT_FOR_DOC = "BridgeTower/bridgetower-base"
 _TOKENIZER_FOR_DOC = "RobertaTokenizer"
 
-
-from ..deprecated._archive_maps import BRIDGETOWER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+BRIDGETOWER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "BridgeTower/bridgetower-base",
+    "BridgeTower/bridgetower-base-itm-mlm",
+    # See all bridgetower models at https://huggingface.co/BridgeTower
+]
 
 
 BRIDGETOWER_START_DOCSTRING = r"""

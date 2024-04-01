@@ -30,7 +30,6 @@ from ...utils import (
     ModelOutput,
     add_start_docstrings,
     add_start_docstrings_to_model_forward,
-    is_accelerate_available,
     is_scipy_available,
     is_timm_available,
     is_vision_available,
@@ -38,7 +37,7 @@ from ...utils import (
     replace_return_docstrings,
     requires_backends,
 )
-from ...utils.backbone_utils import load_backbone
+from ..auto import AutoBackbone
 from .configuration_table_transformer import TableTransformerConfig
 
 
@@ -51,17 +50,15 @@ if is_timm_available():
 if is_vision_available():
     from transformers.image_transforms import center_to_corners_format
 
-if is_accelerate_available():
-    from accelerate import PartialState
-    from accelerate.utils import reduce
-
 logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "TableTransformerConfig"
 _CHECKPOINT_FOR_DOC = "microsoft/table-transformer-detection"
 
-
-from ..deprecated._archive_maps import TABLE_TRANSFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+TABLE_TRANSFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/table-transformer-detection",
+    # See all Table Transformer models at https://huggingface.co/models?filter=table-transformer
+]
 
 
 @dataclass
@@ -293,7 +290,7 @@ class TableTransformerConvEncoder(nn.Module):
                 **kwargs,
             )
         else:
-            backbone = load_backbone(config)
+            backbone = AutoBackbone.from_config(config.backbone_config)
 
         # replace batch norm by frozen batch norm
         with torch.no_grad():
@@ -374,7 +371,7 @@ class TableTransformerSinePositionEmbedding(nn.Module):
             y_embed = y_embed / (y_embed[:, -1:, :] + 1e-6) * self.scale
             x_embed = x_embed / (x_embed[:, :, -1:] + 1e-6) * self.scale
 
-        dim_t = torch.arange(self.embedding_dim, dtype=torch.int64, device=pixel_values.device).float()
+        dim_t = torch.arange(self.embedding_dim, dtype=torch.float32, device=pixel_values.device)
         dim_t = self.temperature ** (2 * torch.div(dim_t, 2, rounding_mode="floor") / self.embedding_dim)
 
         pos_x = x_embed[:, :, :, None] / dim_t
@@ -1434,7 +1431,7 @@ class TableTransformerForObjectDetection(TableTransformerPreTrainedModel):
         >>> inputs = image_processor(images=image, return_tensors="pt")
         >>> outputs = model(**inputs)
 
-        >>> # convert outputs (bounding boxes and class logits) to Pascal VOC format (xmin, ymin, xmax, ymax)
+        >>> # convert outputs (bounding boxes and class logits) to COCO API
         >>> target_sizes = torch.tensor([image.size[::-1]])
         >>> results = image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[
         ...     0
@@ -1754,12 +1751,11 @@ class TableTransformerLoss(nn.Module):
         # Compute the average number of target boxes across all nodes, for normalization purposes
         num_boxes = sum(len(t["class_labels"]) for t in targets)
         num_boxes = torch.as_tensor([num_boxes], dtype=torch.float, device=next(iter(outputs.values())).device)
-        world_size = 1
-        if is_accelerate_available():
-            if PartialState._shared_state != {}:
-                num_boxes = reduce(num_boxes)
-                world_size = PartialState().num_processes
-        num_boxes = torch.clamp(num_boxes / world_size, min=1).item()
+        # (Niels): comment out function below, distributed training to be added
+        # if is_dist_avail_and_initialized():
+        #     torch.distributed.all_reduce(num_boxes)
+        # (Niels) in original implementation, num_boxes is divided by get_world_size()
+        num_boxes = torch.clamp(num_boxes, min=1).item()
 
         # Compute all the requested losses
         losses = {}

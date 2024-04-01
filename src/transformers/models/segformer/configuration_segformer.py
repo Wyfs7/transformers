@@ -27,8 +27,12 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import SEGFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+SEGFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "nvidia/segformer-b0-finetuned-ade-512-512": (
+        "https://huggingface.co/nvidia/segformer-b0-finetuned-ade-512-512/resolve/main/config.json"
+    ),
+    # See all SegFormer models at https://huggingface.co/models?filter=segformer
+}
 
 
 class SegformerConfig(PretrainedConfig):

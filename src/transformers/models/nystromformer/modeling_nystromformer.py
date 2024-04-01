@@ -43,8 +43,10 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "uw-madison/nystromformer-512"
 _CONFIG_FOR_DOC = "NystromformerConfig"
 
-
-from ..deprecated._archive_maps import NYSTROMFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+NYSTROMFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "uw-madison/nystromformer-512",
+    # See all Nyströmformer models at https://huggingface.co/models?filter=nystromformer
+]
 
 
 class NystromformerEmbeddings(nn.Module):

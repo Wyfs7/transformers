@@ -20,8 +20,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import XGLM_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+XGLM_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/xglm-564M": "https://huggingface.co/facebook/xglm-564M/resolve/main/config.json",
+    # See all XGLM models at https://huggingface.co/models?filter=xglm
+}
 
 
 class XGLMConfig(PretrainedConfig):

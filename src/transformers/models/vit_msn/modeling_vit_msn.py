@@ -37,8 +37,10 @@ logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "ViTMSNConfig"
 _CHECKPOINT_FOR_DOC = "facebook/vit-msn-small"
-
-from ..deprecated._archive_maps import VIT_MSN_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+VIT_MSN_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "facebook/vit-msn-small",
+    # See all ViTMSN models at https://huggingface.co/models?filter=vit_msn
+]
 
 
 class ViTMSNEmbeddings(nn.Module):

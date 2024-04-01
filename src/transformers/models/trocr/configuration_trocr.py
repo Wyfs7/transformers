@@ -20,8 +20,12 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import TROCR_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+TROCR_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/trocr-base-handwritten": (
+        "https://huggingface.co/microsoft/trocr-base-handwritten/resolve/main/config.json"
+    ),
+    # See all TrOCR models at https://huggingface.co/models?filter=trocr
+}
 
 
 class TrOCRConfig(PretrainedConfig):

@@ -24,8 +24,10 @@ from ...utils import logging
 logger = logging.get_logger(__name__)
 
 # TODO Update this
-
-from ..deprecated._archive_maps import ESM_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+ESM_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/esm-1b": "https://huggingface.co/facebook/esm-1b/resolve/main/config.json",
+    # See all ESM models at https://huggingface.co/models?filter=esm
+}
 
 
 class EsmConfig(PretrainedConfig):

@@ -38,7 +38,6 @@ from ...modeling_tf_utils import (
     TFModelInputType,
     TFPreTrainedModel,
     get_initializer,
-    keras,
     keras_serializable,
     unpack_inputs,
 )
@@ -200,7 +199,7 @@ def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     return emb
 
 
-class TFViTMAEEmbeddings(keras.layers.Layer):
+class TFViTMAEEmbeddings(tf.keras.layers.Layer):
     """
     Construct the CLS token, position and patch embeddings.
 
@@ -214,7 +213,7 @@ class TFViTMAEEmbeddings(keras.layers.Layer):
 
         self.config = config
 
-    def build(self, input_shape=None):
+    def build(self, input_shape: tf.TensorShape):
         self.cls_token = self.add_weight(
             shape=(1, 1, self.config.hidden_size),
             initializer=tf.random_normal_initializer(stddev=self.config.initializer_range),
@@ -234,12 +233,7 @@ class TFViTMAEEmbeddings(keras.layers.Layer):
         )[None, ...]
         self.position_embeddings.assign(pos_embed)
 
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "patch_embeddings", None) is not None:
-            with tf.name_scope(self.patch_embeddings.name):
-                self.patch_embeddings.build(None)
+        super().build(input_shape)
 
     def random_masking(self, sequence: tf.Tensor, noise: tf.Tensor | None = None):
         """
@@ -299,7 +293,7 @@ class TFViTMAEEmbeddings(keras.layers.Layer):
         return embeddings, mask, ids_restore
 
 
-class TFViTMAEPatchEmbeddings(keras.layers.Layer):
+class TFViTMAEPatchEmbeddings(tf.keras.layers.Layer):
     """
     This class turns `pixel_values` of shape `(batch_size, num_channels, height, width)` into the initial
     `hidden_states` (patch embeddings) of shape `(batch_size, seq_length, hidden_size)` to be consumed by a
@@ -319,7 +313,7 @@ class TFViTMAEPatchEmbeddings(keras.layers.Layer):
         self.num_channels = num_channels
         self.config = config
 
-        self.projection = keras.layers.Conv2D(
+        self.projection = tf.keras.layers.Conv2D(
             filters=hidden_size,
             kernel_size=patch_size,
             strides=patch_size,
@@ -344,7 +338,7 @@ class TFViTMAEPatchEmbeddings(keras.layers.Layer):
                     f" ({self.image_size[0]}*{self.image_size[1]})."
                 )
 
-        # When running on CPU, `keras.layers.Conv2D` doesn't support `NCHW` format.
+        # When running on CPU, `tf.keras.layers.Conv2D` doesn't support `NCHW` format.
         # So change the input format from `NCHW` to `NHWC`.
         # shape = (batch_size, in_height, in_width, in_channels=num_channels)
         pixel_values = tf.transpose(pixel_values, perm=(0, 2, 3, 1))
@@ -358,17 +352,9 @@ class TFViTMAEPatchEmbeddings(keras.layers.Layer):
 
         return x
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "projection", None) is not None:
-            with tf.name_scope(self.projection.name):
-                self.projection.build([None, None, None, self.num_channels])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTSelfAttention with ViT->ViTMAE
-class TFViTMAESelfAttention(keras.layers.Layer):
+class TFViTMAESelfAttention(tf.keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
@@ -383,17 +369,16 @@ class TFViTMAESelfAttention(keras.layers.Layer):
         self.all_head_size = self.num_attention_heads * self.attention_head_size
         self.sqrt_att_head_size = math.sqrt(self.attention_head_size)
 
-        self.query = keras.layers.Dense(
+        self.query = tf.keras.layers.Dense(
             units=self.all_head_size, kernel_initializer=get_initializer(config.initializer_range), name="query"
         )
-        self.key = keras.layers.Dense(
+        self.key = tf.keras.layers.Dense(
             units=self.all_head_size, kernel_initializer=get_initializer(config.initializer_range), name="key"
         )
-        self.value = keras.layers.Dense(
+        self.value = tf.keras.layers.Dense(
             units=self.all_head_size, kernel_initializer=get_initializer(config.initializer_range), name="value"
         )
-        self.dropout = keras.layers.Dropout(rate=config.attention_probs_dropout_prob)
-        self.config = config
+        self.dropout = tf.keras.layers.Dropout(rate=config.attention_probs_dropout_prob)
 
     def transpose_for_scores(self, tensor: tf.Tensor, batch_size: int) -> tf.Tensor:
         # Reshape from [batch_size, seq_length, all_head_size] to [batch_size, seq_length, num_attention_heads, attention_head_size]
@@ -443,23 +428,9 @@ class TFViTMAESelfAttention(keras.layers.Layer):
 
         return outputs
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "query", None) is not None:
-            with tf.name_scope(self.query.name):
-                self.query.build([None, None, self.config.hidden_size])
-        if getattr(self, "key", None) is not None:
-            with tf.name_scope(self.key.name):
-                self.key.build([None, None, self.config.hidden_size])
-        if getattr(self, "value", None) is not None:
-            with tf.name_scope(self.value.name):
-                self.value.build([None, None, self.config.hidden_size])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTSelfOutput with ViT->ViTMAE
-class TFViTMAESelfOutput(keras.layers.Layer):
+class TFViTMAESelfOutput(tf.keras.layers.Layer):
     """
     The residual connection is defined in TFViTMAELayer instead of here (as is the case with other models), due to the
     layernorm applied before each block.
@@ -468,11 +439,10 @@ class TFViTMAESelfOutput(keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
-        self.dense = keras.layers.Dense(
+        self.dense = tf.keras.layers.Dense(
             units=config.hidden_size, kernel_initializer=get_initializer(config.initializer_range), name="dense"
         )
-        self.dropout = keras.layers.Dropout(rate=config.hidden_dropout_prob)
-        self.config = config
+        self.dropout = tf.keras.layers.Dropout(rate=config.hidden_dropout_prob)
 
     def call(self, hidden_states: tf.Tensor, input_tensor: tf.Tensor, training: bool = False) -> tf.Tensor:
         hidden_states = self.dense(inputs=hidden_states)
@@ -480,17 +450,9 @@ class TFViTMAESelfOutput(keras.layers.Layer):
 
         return hidden_states
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "dense", None) is not None:
-            with tf.name_scope(self.dense.name):
-                self.dense.build([None, None, self.config.hidden_size])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTAttention with ViT->ViTMAE
-class TFViTMAEAttention(keras.layers.Layer):
+class TFViTMAEAttention(tf.keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
@@ -517,24 +479,13 @@ class TFViTMAEAttention(keras.layers.Layer):
 
         return outputs
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "self_attention", None) is not None:
-            with tf.name_scope(self.self_attention.name):
-                self.self_attention.build(None)
-        if getattr(self, "dense_output", None) is not None:
-            with tf.name_scope(self.dense_output.name):
-                self.dense_output.build(None)
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTIntermediate with ViT->ViTMAE
-class TFViTMAEIntermediate(keras.layers.Layer):
+class TFViTMAEIntermediate(tf.keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
-        self.dense = keras.layers.Dense(
+        self.dense = tf.keras.layers.Dense(
             units=config.intermediate_size, kernel_initializer=get_initializer(config.initializer_range), name="dense"
         )
 
@@ -542,7 +493,6 @@ class TFViTMAEIntermediate(keras.layers.Layer):
             self.intermediate_act_fn = get_tf_activation(config.hidden_act)
         else:
             self.intermediate_act_fn = config.hidden_act
-        self.config = config
 
     def call(self, hidden_states: tf.Tensor) -> tf.Tensor:
         hidden_states = self.dense(inputs=hidden_states)
@@ -550,25 +500,16 @@ class TFViTMAEIntermediate(keras.layers.Layer):
 
         return hidden_states
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "dense", None) is not None:
-            with tf.name_scope(self.dense.name):
-                self.dense.build([None, None, self.config.hidden_size])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTOutput with ViT->ViTMAE
-class TFViTMAEOutput(keras.layers.Layer):
+class TFViTMAEOutput(tf.keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
-        self.dense = keras.layers.Dense(
+        self.dense = tf.keras.layers.Dense(
             units=config.hidden_size, kernel_initializer=get_initializer(config.initializer_range), name="dense"
         )
-        self.dropout = keras.layers.Dropout(rate=config.hidden_dropout_prob)
-        self.config = config
+        self.dropout = tf.keras.layers.Dropout(rate=config.hidden_dropout_prob)
 
     def call(self, hidden_states: tf.Tensor, input_tensor: tf.Tensor, training: bool = False) -> tf.Tensor:
         hidden_states = self.dense(inputs=hidden_states)
@@ -577,17 +518,9 @@ class TFViTMAEOutput(keras.layers.Layer):
 
         return hidden_states
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "dense", None) is not None:
-            with tf.name_scope(self.dense.name):
-                self.dense.build([None, None, self.config.intermediate_size])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTLayer with ViT->ViTMAE
-class TFViTMAELayer(keras.layers.Layer):
+class TFViTMAELayer(tf.keras.layers.Layer):
     """This corresponds to the Block class in the timm implementation."""
 
     def __init__(self, config: ViTMAEConfig, **kwargs):
@@ -597,9 +530,12 @@ class TFViTMAELayer(keras.layers.Layer):
         self.intermediate = TFViTMAEIntermediate(config, name="intermediate")
         self.vit_output = TFViTMAEOutput(config, name="output")
 
-        self.layernorm_before = keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="layernorm_before")
-        self.layernorm_after = keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="layernorm_after")
-        self.config = config
+        self.layernorm_before = tf.keras.layers.LayerNormalization(
+            epsilon=config.layer_norm_eps, name="layernorm_before"
+        )
+        self.layernorm_after = tf.keras.layers.LayerNormalization(
+            epsilon=config.layer_norm_eps, name="layernorm_after"
+        )
 
     def call(
         self,
@@ -633,29 +569,9 @@ class TFViTMAELayer(keras.layers.Layer):
 
         return outputs
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "attention", None) is not None:
-            with tf.name_scope(self.attention.name):
-                self.attention.build(None)
-        if getattr(self, "intermediate", None) is not None:
-            with tf.name_scope(self.intermediate.name):
-                self.intermediate.build(None)
-        if getattr(self, "vit_output", None) is not None:
-            with tf.name_scope(self.vit_output.name):
-                self.vit_output.build(None)
-        if getattr(self, "layernorm_before", None) is not None:
-            with tf.name_scope(self.layernorm_before.name):
-                self.layernorm_before.build([None, None, self.config.hidden_size])
-        if getattr(self, "layernorm_after", None) is not None:
-            with tf.name_scope(self.layernorm_after.name):
-                self.layernorm_after.build([None, None, self.config.hidden_size])
-
 
 # Copied from transformers.models.vit.modeling_tf_vit.TFViTEncoder with ViT->ViTMAE
-class TFViTMAEEncoder(keras.layers.Layer):
+class TFViTMAEEncoder(tf.keras.layers.Layer):
     def __init__(self, config: ViTMAEConfig, **kwargs):
         super().__init__(**kwargs)
 
@@ -699,18 +615,9 @@ class TFViTMAEEncoder(keras.layers.Layer):
             last_hidden_state=hidden_states, hidden_states=all_hidden_states, attentions=all_attentions
         )
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "layer", None) is not None:
-            for layer in self.layer:
-                with tf.name_scope(layer.name):
-                    layer.build(None)
-
 
 @keras_serializable
-class TFViTMAEMainLayer(keras.layers.Layer):
+class TFViTMAEMainLayer(tf.keras.layers.Layer):
     config_class = ViTMAEConfig
 
     def __init__(self, config: ViTMAEConfig, **kwargs):
@@ -720,9 +627,9 @@ class TFViTMAEMainLayer(keras.layers.Layer):
 
         self.embeddings = TFViTMAEEmbeddings(config, name="embeddings")
         self.encoder = TFViTMAEEncoder(config, name="encoder")
-        self.layernorm = keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="layernorm")
+        self.layernorm = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="layernorm")
 
-    def get_input_embeddings(self) -> keras.layers.Layer:
+    def get_input_embeddings(self) -> tf.keras.layers.Layer:
         return self.embeddings.patch_embeddings
 
     def _prune_heads(self, heads_to_prune):
@@ -780,20 +687,6 @@ class TFViTMAEMainLayer(keras.layers.Layer):
             attentions=encoder_outputs.attentions,
         )
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "embeddings", None) is not None:
-            with tf.name_scope(self.embeddings.name):
-                self.embeddings.build(None)
-        if getattr(self, "encoder", None) is not None:
-            with tf.name_scope(self.encoder.name):
-                self.encoder.build(None)
-        if getattr(self, "layernorm", None) is not None:
-            with tf.name_scope(self.layernorm.name):
-                self.layernorm.build([None, None, self.config.hidden_size])
-
 
 class TFViTMAEPreTrainedModel(TFPreTrainedModel):
     """
@@ -811,7 +704,7 @@ VIT_MAE_START_DOCSTRING = r"""
     library implements for all its model (such as downloading or saving, resizing the input embeddings, pruning heads
     etc.)
 
-    This model is also a [keras.Model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) subclass. Use it
+    This model is also a [tf.keras.Model](https://www.tensorflow.org/api_docs/python/tf/keras/Model) subclass. Use it
     as a regular TF 2.0 Keras Model and refer to the TF 2.0 documentation for all matter related to general usage and
     behavior.
 
@@ -936,19 +829,11 @@ class TFViTMAEModel(TFViTMAEPreTrainedModel):
 
         return outputs
 
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "vit", None) is not None:
-            with tf.name_scope(self.vit.name):
-                self.vit.build(None)
 
-
-class TFViTMAEDecoder(keras.layers.Layer):
+class TFViTMAEDecoder(tf.keras.layers.Layer):
     def __init__(self, config, num_patches, **kwargs):
         super().__init__(**kwargs)
-        self.decoder_embed = keras.layers.Dense(config.decoder_hidden_size, name="decoder_embed")
+        self.decoder_embed = tf.keras.layers.Dense(config.decoder_hidden_size, name="decoder_embed")
 
         decoder_config = deepcopy(config)
         decoder_config.hidden_size = config.decoder_hidden_size
@@ -959,8 +844,8 @@ class TFViTMAEDecoder(keras.layers.Layer):
             TFViTMAELayer(decoder_config, name=f"decoder_layers.{j}") for j in range(config.decoder_num_hidden_layers)
         ]
 
-        self.decoder_norm = keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="decoder_norm")
-        self.decoder_pred = keras.layers.Dense(
+        self.decoder_norm = tf.keras.layers.LayerNormalization(epsilon=config.layer_norm_eps, name="decoder_norm")
+        self.decoder_pred = tf.keras.layers.Dense(
             config.patch_size**2 * config.num_channels,
             kernel_initializer=get_initializer(config.initializer_range),
             name="decoder_pred",
@@ -968,7 +853,7 @@ class TFViTMAEDecoder(keras.layers.Layer):
         self.config = config
         self.num_patches = num_patches
 
-    def build(self, input_shape=None):
+    def build(self, input_shape: tf.TensorShape):
         self.mask_token = self.add_weight(
             shape=(1, 1, self.config.decoder_hidden_size),
             initializer=tf.random_normal_initializer(stddev=self.config.initializer_range),
@@ -988,22 +873,7 @@ class TFViTMAEDecoder(keras.layers.Layer):
         )[None, ...]
         self.decoder_pos_embed.assign(decoder_pos_embed)
 
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "decoder_embed", None) is not None:
-            with tf.name_scope(self.decoder_embed.name):
-                self.decoder_embed.build([None, None, self.config.hidden_size])
-        if getattr(self, "decoder_norm", None) is not None:
-            with tf.name_scope(self.decoder_norm.name):
-                self.decoder_norm.build([None, None, self.config.decoder_hidden_size])
-        if getattr(self, "decoder_pred", None) is not None:
-            with tf.name_scope(self.decoder_pred.name):
-                self.decoder_pred.build([None, None, self.config.decoder_hidden_size])
-        if getattr(self, "decoder_layers", None) is not None:
-            for layer in self.decoder_layers:
-                with tf.name_scope(layer.name):
-                    layer.build(None)
+        super().build(input_shape)
 
     def call(
         self,
@@ -1258,14 +1128,3 @@ class TFViTMAEForPreTraining(TFViTMAEPreTrainedModel):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
-
-    def build(self, input_shape=None):
-        if self.built:
-            return
-        self.built = True
-        if getattr(self, "vit", None) is not None:
-            with tf.name_scope(self.vit.name):
-                self.vit.build(None)
-        if getattr(self, "decoder", None) is not None:
-            with tf.name_scope(self.decoder.name):
-                self.decoder.build(None)

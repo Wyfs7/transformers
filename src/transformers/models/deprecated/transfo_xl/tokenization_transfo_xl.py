@@ -55,9 +55,18 @@ VOCAB_FILES_NAMES = {
     "vocab_file": "vocab.txt",
 }
 
+PRETRAINED_VOCAB_FILES_MAP = {
+    "pretrained_vocab_file": {
+        "transfo-xl-wt103": "https://huggingface.co/transfo-xl-wt103/resolve/main/vocab.pkl",
+    }
+}
+
+PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
+    "transfo-xl-wt103": None,
+}
 
 PRETRAINED_CORPUS_ARCHIVE_MAP = {
-    "transfo-xl/transfo-xl-wt103": "https://huggingface.co/transfo-xl/transfo-xl-wt103/resolve/main/corpus.bin",
+    "transfo-xl-wt103": "https://huggingface.co/transfo-xl-wt103/resolve/main/corpus.bin",
 }
 CORPUS_NAME = "corpus.bin"
 
@@ -153,6 +162,8 @@ class TransfoXLTokenizer(PreTrainedTokenizer):
     """
 
     vocab_files_names = VOCAB_FILES_NAMES
+    pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
+    max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
     model_input_names = ["input_ids"]
 
     def __init__(
@@ -440,7 +451,7 @@ class TransfoXLTokenizer(PreTrainedTokenizer):
         Example:
 
         ```python
-        >>> tokenizer = TransfoXLTokenizer.from_pretrained("transfo-xl/transfo-xl-wt103")
+        >>> tokenizer = TransfoXLTokenizer.from_pretrained("transfo-xl-wt103")
         >>> tokenizer.moses_pipeline("23,000 people are 1.80 m tall")
         ['23', '@,@', '000', 'people', 'are', '1', '@.@', '80', 'm', 'tall']
         ```"""

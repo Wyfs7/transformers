@@ -54,9 +54,12 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "google/bigbird-roberta-base"
 _CONFIG_FOR_DOC = "BigBirdConfig"
 
-
-from ..deprecated._archive_maps import BIG_BIRD_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
-
+BIG_BIRD_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "google/bigbird-roberta-base",
+    "google/bigbird-roberta-large",
+    "google/bigbird-base-trivia-itc",
+    # See all BigBird models at https://huggingface.co/models?filter=big_bird
+]
 
 _TRIVIA_QA_MAPPING = {
     "big_bird_attention": "attention/self",
@@ -2220,7 +2223,7 @@ class BigBirdModel(BigBirdPreTrainedModel):
 
         padding_len = (block_size - seq_len % block_size) % block_size
         if padding_len > 0:
-            logger.warning_once(
+            logger.info(
                 f"Input ids are automatically padded from {seq_len} to {seq_len + padding_len} to be a multiple of "
                 f"`config.block_size`: {block_size}"
             )

@@ -21,8 +21,9 @@ from ...utils.backbone_utils import BackboneConfigMixin, get_aligned_output_feat
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import BIT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+BIT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "google/bit-50": "https://huggingface.co/google/bit-50/resolve/main/config.json",
+}
 
 
 class BitConfig(BackboneConfigMixin, PretrainedConfig):
@@ -64,13 +65,11 @@ class BitConfig(BackboneConfigMixin, PretrainedConfig):
         out_features (`List[str]`, *optional*):
             If used as backbone, list of features to output. Can be any of `"stem"`, `"stage1"`, `"stage2"`, etc.
             (depending on how many stages the model has). If unset and `out_indices` is set, will default to the
-            corresponding stages. If unset and `out_indices` is unset, will default to the last stage. Must be in the
-            same order as defined in the `stage_names` attribute.
+            corresponding stages. If unset and `out_indices` is unset, will default to the last stage.
         out_indices (`List[int]`, *optional*):
             If used as backbone, list of indices of features to output. Can be any of 0, 1, 2, etc. (depending on how
             many stages the model has). If unset and `out_features` is set, will default to the corresponding stages.
-            If unset and `out_features` is unset, will default to the last stage. Must be in the
-            same order as defined in the `stage_names` attribute.
+            If unset and `out_features` is unset, will default to the last stage.
 
     Example:
     ```python

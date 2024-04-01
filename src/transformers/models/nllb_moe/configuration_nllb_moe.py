@@ -19,8 +19,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import NLLB_MOE_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+NLLB_MOE_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/nllb-moe-54B": "https://huggingface.co/facebook/nllb-moe-54b/resolve/main/config.json",
+}
 
 
 class NllbMoeConfig(PretrainedConfig):

@@ -27,8 +27,11 @@ if TYPE_CHECKING:
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import IMAGEGPT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+IMAGEGPT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "openai/imagegpt-small": "",
+    "openai/imagegpt-medium": "",
+    "openai/imagegpt-large": "",
+}
 
 
 class ImageGPTConfig(PretrainedConfig):

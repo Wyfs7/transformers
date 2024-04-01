@@ -68,8 +68,10 @@ _IMAGE_CLASS_CHECKPOINT = "shi-labs/nat-mini-in1k-224"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "tiger cat"
 
 
-from ..deprecated._archive_maps import NAT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
-
+NAT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "shi-labs/nat-mini-in1k-224",
+    # See all Nat models at https://huggingface.co/models?filter=nat
+]
 
 # drop_path and NatDropPath are from the timm library.
 
@@ -102,9 +104,9 @@ class NatEncoderOutput(ModelOutput):
     """
 
     last_hidden_state: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -138,9 +140,9 @@ class NatModelOutput(ModelOutput):
 
     last_hidden_state: torch.FloatTensor = None
     pooler_output: Optional[torch.FloatTensor] = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -174,9 +176,9 @@ class NatImageClassifierOutput(ModelOutput):
 
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    reshaped_hidden_states: Optional[Tuple[torch.FloatTensor]] = None
 
 
 class NatEmbeddings(nn.Module):

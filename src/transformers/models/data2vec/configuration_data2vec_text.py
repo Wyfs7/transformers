@@ -23,8 +23,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import DATA2VEC_TEXT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+DATA2VEC_TEXT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/data2vec-text-base": "https://huggingface.co/data2vec/resolve/main/config.json",
+}
 
 
 class Data2VecTextConfig(PretrainedConfig):

@@ -21,8 +21,9 @@ from ..auto import CONFIG_MAPPING
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import FUYU_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+FUYU_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "adept/fuyu-8b": "https://huggingface.co/adept/fuyu-8b/resolve/main/config.json",
+}
 
 
 class FuyuConfig(PretrainedConfig):
@@ -199,7 +200,8 @@ class FuyuConfig(PretrainedConfig):
 
         if not isinstance(self.rope_scaling, dict) or len(self.rope_scaling) != 2:
             raise ValueError(
-                "`rope_scaling` must be a dictionary with two fields, `type` and `factor`, " f"got {self.rope_scaling}"
+                "`rope_scaling` must be a dictionary with with two fields, `type` and `factor`, "
+                f"got {self.rope_scaling}"
             )
         rope_scaling_type = self.rope_scaling.get("type", None)
         rope_scaling_factor = self.rope_scaling.get("factor", None)

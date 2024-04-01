@@ -33,8 +33,10 @@ logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "CTRLConfig"
 
-
-from ..deprecated._archive_maps import CTRL_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+CTRL_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "Salesforce/ctrl"
+    # See all CTRL models at https://huggingface.co/models?filter=ctrl
+]
 
 
 def angle_defn(pos, i, d_model_size):
@@ -45,8 +47,8 @@ def angle_defn(pos, i, d_model_size):
 def positional_encoding(position, d_model_size, dtype):
     # create the sinusoidal pattern for the positional encoding
     angle_rads = angle_defn(
-        torch.arange(position, dtype=torch.int64).to(dtype).unsqueeze(1),
-        torch.arange(d_model_size, dtype=torch.int64).to(dtype).unsqueeze(0),
+        torch.arange(position, dtype=dtype).unsqueeze(1),
+        torch.arange(d_model_size, dtype=dtype).unsqueeze(0),
         d_model_size,
     )
 
@@ -794,10 +796,9 @@ class CTRLForSequenceClassification(CTRLPreTrainedModel):
             sequence_lengths = -1
         else:
             if input_ids is not None:
-                # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
-                sequence_lengths = torch.eq(input_ids, self.config.pad_token_id).int().argmax(-1) - 1
-                sequence_lengths = sequence_lengths % input_ids.shape[-1]
-                sequence_lengths = sequence_lengths.to(logits.device)
+                sequence_lengths = (torch.eq(input_ids, self.config.pad_token_id).int().argmax(-1) - 1).to(
+                    logits.device
+                )
             else:
                 sequence_lengths = -1
                 logger.warning(

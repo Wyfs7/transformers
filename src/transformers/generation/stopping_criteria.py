@@ -2,7 +2,7 @@ import time
 import warnings
 from abc import ABC
 from copy import deepcopy
-from typing import List, Optional, Union
+from typing import Optional
 
 import torch
 
@@ -29,8 +29,7 @@ STOPPING_CRITERIA_INPUTS_DOCSTRING = r"""
             Additional stopping criteria specific kwargs.
 
     Return:
-        `torch.BoolTensor`. (`torch.BoolTensor` of shape `(batch_size, 1)`), where `True` indicates we stop generation
-            for a particular row, `True` indicates we should continue.
+        `bool`. `False` indicates we should continue, `True` indicates we should stop.
 
 """
 
@@ -43,7 +42,7 @@ class StoppingCriteria(ABC):
     """
 
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
         raise NotImplementedError("StoppingCriteria needs to be subclassed")
 
 
@@ -64,7 +63,7 @@ class MaxLengthCriteria(StoppingCriteria):
         self.max_position_embeddings = max_position_embeddings
 
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
         cur_len = input_ids.shape[-1]
         is_done = cur_len >= self.max_length
         if self.max_position_embeddings is not None and not is_done and cur_len >= self.max_position_embeddings:
@@ -73,7 +72,7 @@ class MaxLengthCriteria(StoppingCriteria):
                 f"maximum length ({self.max_position_embeddings}). Depending on the model, you may observe "
                 "exceptions, performance degradation, or nothing at all."
             )
-        return torch.full((input_ids.shape[0],), is_done, device=input_ids.device, dtype=torch.bool)
+        return is_done
 
 
 class MaxNewTokensCriteria(StoppingCriteria):
@@ -101,9 +100,8 @@ class MaxNewTokensCriteria(StoppingCriteria):
         self.max_length = start_length + max_new_tokens
 
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
-        is_done = input_ids.shape[-1] >= self.max_length
-        return torch.full((input_ids.shape[0],), is_done, device=input_ids.device, dtype=torch.bool)
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+        return input_ids.shape[-1] >= self.max_length
 
 
 class MaxTimeCriteria(StoppingCriteria):
@@ -124,39 +122,14 @@ class MaxTimeCriteria(StoppingCriteria):
         self.initial_timestamp = time.time() if initial_timestamp is None else initial_timestamp
 
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
-        is_done = time.time() - self.initial_timestamp > self.max_time
-        return torch.full((input_ids.shape[0],), is_done, device=input_ids.device, dtype=torch.bool)
-
-
-class EosTokenCriteria(StoppingCriteria):
-    """
-    This class can be used to stop generation whenever the "end-of-sequence" token is generated.
-    By default, it uses the `model.generation_config.eos_token_id`.
-
-    Args:
-        eos_token_id (`Union[int, List[int]]`):
-            The id of the *end-of-sequence* token. Optionally, use a list to set multiple *end-of-sequence* tokens.
-    """
-
-    def __init__(self, eos_token_id: Union[int, List[int]]):
-        if isinstance(eos_token_id, int):
-            eos_token_id = [eos_token_id]
-        self.eos_token_id = torch.tensor(eos_token_id)
-
-    @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
-        is_done = torch.isin(input_ids[:, -1], self.eos_token_id.to(input_ids.device))
-        return is_done
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+        return time.time() - self.initial_timestamp > self.max_time
 
 
 class StoppingCriteriaList(list):
     @add_start_docstrings(STOPPING_CRITERIA_INPUTS_DOCSTRING)
-    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> torch.BoolTensor:
-        is_done = torch.full((input_ids.shape[0],), False, device=input_ids.device)
-        for criteria in self:
-            is_done = is_done | criteria(input_ids, scores, **kwargs)
-        return is_done
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs) -> bool:
+        return any(criteria(input_ids, scores) for criteria in self)
 
     @property
     def max_length(self) -> Optional[int]:

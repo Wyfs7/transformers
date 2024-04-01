@@ -50,7 +50,10 @@ _IMAGE_CLASS_CHECKPOINT = "snap-research/efficientformer-l1-300"
 _IMAGE_CLASS_EXPECTED_OUTPUT = "Egyptian cat"
 
 
-from ..deprecated._archive_maps import EFFICIENTFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+EFFICIENTFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "snap-research/efficientformer-l1-300",
+    # See all EfficientFormer models at https://huggingface.co/models?filter=efficientformer
+]
 
 
 class EfficientFormerPatchEmbeddings(nn.Module):

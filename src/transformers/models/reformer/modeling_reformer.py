@@ -50,8 +50,11 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "google/reformer-crime-and-punishment"
 _CONFIG_FOR_DOC = "ReformerConfig"
 
-
-from ..deprecated._archive_maps import REFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+REFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "google/reformer-crime-and-punishment",
+    "google/reformer-enwik8",
+    # See all Reformer models at https://huggingface.co/models?filter=reformer
+]
 
 
 # Define named tuples for nn.Modules here
@@ -2136,7 +2139,7 @@ class ReformerModel(ReformerPreTrainedModel):
         padded_seq_length=None,
         device=None,
     ):
-        logger.warning_once(
+        logger.info(
             f"Input ids are automatically padded from {input_shape[-1]} to {input_shape[-1] + padding_length} to be a "
             f"multiple of `config.chunk_length`: {padded_seq_length}"
         )

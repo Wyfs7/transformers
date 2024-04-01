@@ -45,8 +45,10 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "microsoft/git-base"
 _CONFIG_FOR_DOC = "GitConfig"
 
-
-from ..deprecated._archive_maps import GIT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+GIT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/git-base",
+    # See all GIT models at https://huggingface.co/models?filter=git
+]
 
 
 @dataclass
@@ -75,8 +77,8 @@ class GitVisionModelOutput(ModelOutput):
 
     image_embeds: Optional[torch.FloatTensor] = None
     last_hidden_state: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 class GitEmbeddings(nn.Module):

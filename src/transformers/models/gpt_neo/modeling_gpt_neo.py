@@ -67,9 +67,10 @@ logger = logging.get_logger(__name__)
 
 _CONFIG_FOR_DOC = "GPTNeoConfig"
 
-
-from ..deprecated._archive_maps import GPT_NEO_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
-
+GPT_NEO_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "EleutherAI/gpt-neo-1.3B",
+    # See all GPTNeo models at https://huggingface.co/models?filter=gpt_neo
+]
 
 _CHECKPOINT_FOR_DOC = "EleutherAI/gpt-neo-1.3B"
 
@@ -79,7 +80,7 @@ def _get_unpad_data(attention_mask):
     seqlens_in_batch = attention_mask.sum(dim=-1, dtype=torch.int32)
     indices = torch.nonzero(attention_mask.flatten(), as_tuple=False).flatten()
     max_seqlen_in_batch = seqlens_in_batch.max().item()
-    cu_seqlens = F.pad(torch.cumsum(seqlens_in_batch, dim=0, dtype=torch.int32), (1, 0))
+    cu_seqlens = F.pad(torch.cumsum(seqlens_in_batch, dim=0, dtype=torch.torch.int32), (1, 0))
     return (
         indices,
         cu_seqlens,
@@ -356,10 +357,8 @@ class GPTNeoFlashAttention2(GPTNeoSelfAttention):
         # in fp32. (LlamaRMSNorm handles it correctly)
 
         if query.dtype == torch.float32:
-            if torch.is_autocast_enabled():
-                target_dtype = torch.get_autocast_gpu_dtype()
             # Handle the case where the model is quantized
-            elif hasattr(self.config, "_pre_quantization_dtype"):
+            if hasattr(self.config, "_pre_quantization_dtype"):
                 target_dtype = self.config._pre_quantization_dtype
             else:
                 target_dtype = self.q_proj.weight.dtype
@@ -406,7 +405,7 @@ class GPTNeoFlashAttention2(GPTNeoSelfAttention):
             attention_mask (`torch.Tensor`):
                 The padding mask - corresponds to a tensor of size `(batch_size, seq_len)` where 0 stands for the
                 position of padding tokens and 1 for the position of non-padding tokens.
-            dropout (`float`):
+            dropout (`int`, *optional*):
                 Attention dropout
             softmax_scale (`float`, *optional*):
                 The scaling of QK^T before applying softmax. Default to 1 / sqrt(head_dim)
@@ -1114,10 +1113,9 @@ class GPTNeoForSequenceClassification(GPTNeoPreTrainedModel):
             sequence_lengths = -1
         else:
             if input_ids is not None:
-                # if no pad token found, use modulo instead of reverse indexing for ONNX compatibility
-                sequence_lengths = torch.eq(input_ids, self.config.pad_token_id).int().argmax(-1) - 1
-                sequence_lengths = sequence_lengths % input_ids.shape[-1]
-                sequence_lengths = sequence_lengths.to(logits.device)
+                sequence_lengths = (torch.eq(input_ids, self.config.pad_token_id).int().argmax(-1) - 1).to(
+                    logits.device
+                )
             else:
                 sequence_lengths = -1
                 logger.warning(

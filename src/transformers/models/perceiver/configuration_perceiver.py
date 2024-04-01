@@ -27,8 +27,10 @@ from ...utils import TensorType, logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import PERCEIVER_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+PERCEIVER_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "deepmind/language-perceiver": "https://huggingface.co/deepmind/language-perceiver/resolve/main/config.json",
+    # See all Perceiver models at https://huggingface.co/models?filter=perceiver
+}
 
 
 class PerceiverConfig(PretrainedConfig):

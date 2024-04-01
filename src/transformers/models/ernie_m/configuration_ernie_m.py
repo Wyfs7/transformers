@@ -20,7 +20,12 @@ from __future__ import annotations
 from typing import Dict
 
 from ...configuration_utils import PretrainedConfig
-from ..deprecated._archive_maps import ERNIE_M_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+
+
+ERNIE_M_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "susnato/ernie-m-base_pytorch": "https://huggingface.co/susnato/ernie-m-base_pytorch/blob/main/config.json",
+    "susnato/ernie-m-large_pytorch": "https://huggingface.co/susnato/ernie-m-large_pytorch/blob/main/config.json",
+}
 
 
 class ErnieMConfig(PretrainedConfig):
@@ -56,20 +61,19 @@ class ErnieMConfig(PretrainedConfig):
             The dropout probability for all fully connected layers in the embeddings and encoder.
         attention_probs_dropout_prob (`float`, *optional*, defaults to 0.1):
             The dropout probability used in `MultiHeadAttention` in all encoder layers to drop some attention target.
-        max_position_embeddings (`int`, *optional*, defaults to 514):
+        act_dropout (`float`, *optional*, defaults to 0.0):
+            This dropout probability is used in `ErnieMEncoderLayer` after activation.
+        max_position_embeddings (`int`, *optional*, defaults to 512):
             The maximum value of the dimensionality of position encoding, which dictates the maximum supported length
             of an input sequence.
-        initializer_range (`float`, *optional*, defaults to 0.02):
-            The standard deviation of the normal initializer for initializing all weight matrices. The index of padding
-            token in the token vocabulary.
-        pad_token_id (`int`, *optional*, defaults to 1):
-            Padding token id.
         layer_norm_eps (`float`, *optional*, defaults to 1e-05):
             The epsilon used by the layer normalization layers.
         classifier_dropout (`float`, *optional*):
             The dropout ratio for the classification head.
-        act_dropout (`float`, *optional*, defaults to 0.0):
-            This dropout probability is used in `ErnieMEncoderLayer` after activation.
+        initializer_range (`float`, *optional*, defaults to 0.02):
+            The standard deviation of the normal initializer for initializing all weight matrices.
+        pad_token_id(`int`, *optional*, defaults to 1):
+            The index of padding token in the token vocabulary.
 
     A normal_initializer initializes weight matrices as normal distributions. See
     `ErnieMPretrainedModel._init_weights()` for how weights are initialized in `ErnieMModel`.
@@ -93,6 +97,7 @@ class ErnieMConfig(PretrainedConfig):
         pad_token_id: int = 1,
         layer_norm_eps: float = 1e-05,
         classifier_dropout=None,
+        is_decoder=False,
         act_dropout=0.0,
         **kwargs,
     ):
@@ -109,4 +114,5 @@ class ErnieMConfig(PretrainedConfig):
         self.initializer_range = initializer_range
         self.layer_norm_eps = layer_norm_eps
         self.classifier_dropout = classifier_dropout
+        self.is_decoder = is_decoder
         self.act_dropout = act_dropout

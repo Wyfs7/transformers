@@ -23,8 +23,9 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import XCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+XCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/xclip-base-patch32": "https://huggingface.co/microsoft/xclip-base-patch32/resolve/main/config.json",
+}
 
 
 class XCLIPTextConfig(PretrainedConfig):
@@ -346,7 +347,7 @@ class XCLIPConfig(PretrainedConfig):
                             f"`text_config_dict` is provided which will be used to initialize `XCLIPTextConfig`. The "
                             f'value `text_config["{key}"]` will be overriden.'
                         )
-                    logger.info(message)
+                    logger.warning(message)
 
             # Update all values in `text_config` with the ones in `_text_config_dict`.
             text_config.update(_text_config_dict)
@@ -378,7 +379,7 @@ class XCLIPConfig(PretrainedConfig):
                             f"`vision_config_dict` is provided which will be used to initialize `XCLIPVisionConfig`. "
                             f'The value `vision_config["{key}"]` will be overriden.'
                         )
-                    logger.info(message)
+                    logger.warning(message)
 
             # Update all values in `vision_config` with the ones in `_vision_config_dict`.
             vision_config.update(_vision_config_dict)

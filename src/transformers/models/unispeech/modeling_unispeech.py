@@ -56,8 +56,11 @@ _EXPECTED_OUTPUT_SHAPE = [1, 292, 1024]
 _CTC_EXPECTED_OUTPUT = "'mister quilter is the apposl of the midle classes and weare glad to welcom his gosepl'"
 _CTC_EXPECTED_LOSS = 17.17
 
-
-from ..deprecated._archive_maps import UNISPEECH_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+UNISPEECH_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/unispeech-large-1500h-cv",
+    "microsoft/unispeech-large-multi-lingual-1500h-cv",
+    # See all UniSpeech models at https://huggingface.co/models?filter=unispeech
+]
 
 
 @dataclass

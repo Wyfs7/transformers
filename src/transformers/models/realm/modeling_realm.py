@@ -42,8 +42,17 @@ _ENCODER_CHECKPOINT_FOR_DOC = "google/realm-cc-news-pretrained-encoder"
 _SCORER_CHECKPOINT_FOR_DOC = "google/realm-cc-news-pretrained-scorer"
 _CONFIG_FOR_DOC = "RealmConfig"
 
-
-from ..deprecated._archive_maps import REALM_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+REALM_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "google/realm-cc-news-pretrained-embedder",
+    "google/realm-cc-news-pretrained-encoder",
+    "google/realm-cc-news-pretrained-scorer",
+    "google/realm-cc-news-pretrained-openqa",
+    "google/realm-orqa-nq-openqa",
+    "google/realm-orqa-nq-reader",
+    "google/realm-orqa-wq-openqa",
+    "google/realm-orqa-wq-reader",
+    # See all REALM models at https://huggingface.co/models?filter=realm
+]
 
 
 def load_tf_weights_in_realm(model, config, tf_checkpoint_path):

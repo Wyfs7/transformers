@@ -44,8 +44,12 @@ _CHECKPOINT_FOR_DOC = "microsoft/deberta-v2-xlarge"
 _QA_TARGET_START_INDEX = 2
 _QA_TARGET_END_INDEX = 9
 
-
-from ..deprecated._archive_maps import DEBERTA_V2_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+DEBERTA_V2_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "microsoft/deberta-v2-xlarge",
+    "microsoft/deberta-v2-xxlarge",
+    "microsoft/deberta-v2-xlarge-mnli",
+    "microsoft/deberta-v2-xxlarge-mnli",
+]
 
 
 # Copied from transformers.models.deberta.modeling_deberta.ContextPooler

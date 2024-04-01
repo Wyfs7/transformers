@@ -23,8 +23,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import SEW_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+SEW_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "asapp/sew-tiny-100k": "https://huggingface.co/asapp/sew-tiny-100k/resolve/main/config.json",
+    # See all SEW models at https://huggingface.co/models?filter=sew
+}
 
 
 class SEWConfig(PretrainedConfig):

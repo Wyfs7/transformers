@@ -42,8 +42,14 @@ logger = logging.get_logger(__name__)
 _CHECKPOINT_FOR_DOC = "allenai/longformer-base-4096"
 _CONFIG_FOR_DOC = "LongformerConfig"
 
-
-from ..deprecated._archive_maps import LONGFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+LONGFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "allenai/longformer-base-4096",
+    "allenai/longformer-large-4096",
+    "allenai/longformer-large-4096-finetuned-triviaqa",
+    "allenai/longformer-base-4096-extra.pos.embd.only",
+    "allenai/longformer-large-4096-extra.pos.embd.only",
+    # See all Longformer models at https://huggingface.co/models?filter=longformer
+]
 
 
 @dataclass
@@ -84,9 +90,9 @@ class LongformerBaseModelOutput(ModelOutput):
     """
 
     last_hidden_state: torch.FloatTensor
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -132,9 +138,9 @@ class LongformerBaseModelOutputWithPooling(ModelOutput):
 
     last_hidden_state: torch.FloatTensor
     pooler_output: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -178,9 +184,9 @@ class LongformerMaskedLMOutput(ModelOutput):
 
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -227,9 +233,9 @@ class LongformerQuestionAnsweringModelOutput(ModelOutput):
     loss: Optional[torch.FloatTensor] = None
     start_logits: torch.FloatTensor = None
     end_logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -273,9 +279,9 @@ class LongformerSequenceClassifierOutput(ModelOutput):
 
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -321,9 +327,9 @@ class LongformerMultipleChoiceModelOutput(ModelOutput):
 
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 @dataclass
@@ -367,9 +373,9 @@ class LongformerTokenClassifierOutput(ModelOutput):
 
     loss: Optional[torch.FloatTensor] = None
     logits: torch.FloatTensor = None
-    hidden_states: Optional[Tuple[torch.FloatTensor, ...]] = None
-    attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
-    global_attentions: Optional[Tuple[torch.FloatTensor, ...]] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+    global_attentions: Optional[Tuple[torch.FloatTensor]] = None
 
 
 def _get_question_end_index(input_ids, sep_token_id):
@@ -1592,7 +1598,7 @@ class LongformerModel(LongformerPreTrainedModel):
 
         # this path should be recorded in the ONNX export, it is fine with padding_len == 0 as well
         if padding_len > 0:
-            logger.warning_once(
+            logger.info(
                 f"Input ids are automatically padded from {seq_len} to {seq_len + padding_len} to be a multiple of "
                 f"`config.attention_window`: {attention_window}"
             )
@@ -1911,7 +1917,7 @@ class LongformerForSequenceClassification(LongformerPreTrainedModel):
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         if global_attention_mask is None:
-            logger.warning_once("Initializing global attention on CLS token...")
+            logger.info("Initializing global attention on CLS token...")
             global_attention_mask = torch.zeros_like(input_ids)
             # global attention on cls token
             global_attention_mask[:, 0] = 1
@@ -2264,7 +2270,7 @@ class LongformerForMultipleChoice(LongformerPreTrainedModel):
 
         # set global attention on question tokens
         if global_attention_mask is None and input_ids is not None:
-            logger.warning_once("Initializing global attention on multiple choice...")
+            logger.info("Initializing global attention on multiple choice...")
             # put global attention on all tokens after `config.sep_token_id`
             global_attention_mask = torch.stack(
                 [

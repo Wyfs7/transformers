@@ -22,8 +22,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import ALTCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+ALTCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "BAAI/AltCLIP": "https://huggingface.co/BAAI/AltCLIP/resolve/main/config.json",
+    # See all AltCLIP models at https://huggingface.co/models?filter=altclip
+}
 
 
 class AltCLIPTextConfig(PretrainedConfig):
@@ -337,7 +339,7 @@ class AltCLIPConfig(PretrainedConfig):
                             f"`text_config_dict` is provided which will be used to initialize `AltCLIPTextConfig`. The "
                             f'value `text_config["{key}"]` will be overriden.'
                         )
-                    logger.info(message)
+                    logger.warning(message)
 
             # Update all values in `text_config` with the ones in `_text_config_dict`.
             text_config.update(_text_config_dict)
@@ -369,7 +371,7 @@ class AltCLIPConfig(PretrainedConfig):
                             f"`vision_config_dict` is provided which will be used to initialize `AltCLIPVisionConfig`. "
                             f'The value `vision_config["{key}"]` will be overriden.'
                         )
-                    logger.info(message)
+                    logger.warning(message)
 
             # Update all values in `vision_config` with the ones in `_vision_config_dict`.
             vision_config.update(_vision_config_dict)

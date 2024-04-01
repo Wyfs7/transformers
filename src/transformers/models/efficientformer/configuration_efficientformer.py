@@ -22,8 +22,11 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import EFFICIENTFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+EFFICIENTFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "snap-research/efficientformer-l1-300": (
+        "https://huggingface.co/snap-research/efficientformer-l1-300/resolve/main/config.json"
+    ),
+}
 
 
 class EfficientFormerConfig(PretrainedConfig):

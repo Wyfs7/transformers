@@ -22,8 +22,11 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import PROPHETNET_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+PROPHETNET_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/prophetnet-large-uncased": (
+        "https://huggingface.co/microsoft/prophetnet-large-uncased/resolve/main/config.json"
+    ),
+}
 
 
 class ProphetNetConfig(PretrainedConfig):

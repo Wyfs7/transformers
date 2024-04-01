@@ -32,6 +32,8 @@ from ...tokenization_utils_base import (
 )
 from ...utils import PaddingStrategy, TensorType, add_end_docstrings, logging
 from ..xlm_roberta.tokenization_xlm_roberta import (
+    PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES,
+    PRETRAINED_VOCAB_FILES_MAP,
     SPIECE_UNDERLINE,
     VOCAB_FILES_NAMES,
 )
@@ -223,6 +225,8 @@ class LayoutXLMTokenizer(PreTrainedTokenizer):
     """
 
     vocab_files_names = VOCAB_FILES_NAMES
+    pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
+    max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
     model_input_names = ["input_ids", "attention_mask"]
 
     def __init__(

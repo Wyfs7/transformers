@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 import numpy as np
 import regex as re
 
-from ...utils import is_tf_available, is_torch_available, logging, to_py_obj
+from ...utils import is_tf_available, is_torch_available, logging
 
 
 if TYPE_CHECKING:
@@ -40,6 +40,19 @@ logger = logging.get_logger(__name__)
 VOCAB_FILES_NAMES = {
     "vocab_file": "vocab.json",
     "merges_file": "merges.txt",
+}
+
+PRETRAINED_VOCAB_FILES_MAP = {
+    "vocab_file": {
+        "Salesforce/codegen-350M-mono": "https://huggingface.co/Salesforce/codegen-350M-mono/resolve/main/vocab.json",
+    },
+    "merges_file": {
+        "Salesforce/codegen-350M-mono": "https://huggingface.co/Salesforce/codegen-350M-mono/resolve/main/merges.txt",
+    },
+}
+
+PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
+    "Salesforce/codegen-350M-mono": 2048,
 }
 
 
@@ -137,6 +150,8 @@ class CodeGenTokenizer(PreTrainedTokenizer):
     """
 
     vocab_files_names = VOCAB_FILES_NAMES
+    pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
+    max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
     model_input_names = ["input_ids", "attention_mask"]
 
     def __init__(
@@ -337,9 +352,6 @@ class CodeGenTokenizer(PreTrainedTokenizer):
         Returns:
             `str`: The decoded sentence.
         """
-
-        token_ids = to_py_obj(token_ids)
-
         decoded_text = super()._decode(
             token_ids=token_ids,
             skip_special_tokens=skip_special_tokens,

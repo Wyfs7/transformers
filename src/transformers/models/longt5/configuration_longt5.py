@@ -22,8 +22,12 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import LONGT5_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+LONGT5_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "google/long-t5-local-base": "https://huggingface.co/google/long-t5-local-base/blob/main/config.json",
+    "google/long-t5-local-large": "https://huggingface.co/google/long-t5-local-large/blob/main/config.json",
+    "google/long-t5-tglobal-base": "https://huggingface.co/google/long-t5-tglobal-base/blob/main/config.json",
+    "google/long-t5-tglobal-large": "https://huggingface.co/google/long-t5-tglobal-large/blob/main/config.json",
+}
 
 
 class LongT5Config(PretrainedConfig):

@@ -28,8 +28,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import PVT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+PVT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "pvt-tiny-224": "https://huggingface.co/Zetatech/pvt-tiny-224",
+    # See all PVT models at https://huggingface.co/models?filter=pvt
+}
 
 
 class PvtConfig(PretrainedConfig):

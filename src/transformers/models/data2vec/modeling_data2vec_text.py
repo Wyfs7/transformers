@@ -55,7 +55,10 @@ _CHECKPOINT_FOR_DOC = "facebook/data2vec-text-base"
 _CONFIG_FOR_DOC = "Data2VecTextConfig"
 
 
-from ..deprecated._archive_maps import DATA2VEC_TEXT_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+DATA2VEC_TEXT_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "facebook/data2vec-text-base",
+    # See all data2vec models at https://huggingface.co/models?filter=data2vec-text
+]
 
 
 # Copied from transformers.models.roberta.modeling_roberta.RobertaEmbeddings with Roberta->Data2VecText

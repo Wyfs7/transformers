@@ -46,7 +46,10 @@ logger = logging.get_logger(__name__)
 _CONFIG_FOR_DOC = "TimeSeriesTransformerConfig"
 
 
-from ..deprecated._archive_maps import TIME_SERIES_TRANSFORMER_PRETRAINED_MODEL_ARCHIVE_LIST  # noqa: F401, E402
+TIME_SERIES_TRANSFORMER_PRETRAINED_MODEL_ARCHIVE_LIST = [
+    "huggingface/time-series-transformer-tourism-monthly",
+    # See all TimeSeriesTransformer models at https://huggingface.co/models?filter=time_series_transformer
+]
 
 
 class TimeSeriesFeatureEmbedder(nn.Module):

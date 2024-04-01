@@ -22,20 +22,11 @@ from collections.abc import MutableMapping
 from contextlib import ExitStack, contextmanager
 from dataclasses import fields, is_dataclass
 from enum import Enum
-from functools import partial
 from typing import Any, ContextManager, Iterable, List, Tuple
 
 import numpy as np
-from packaging import version
 
-from .import_utils import (
-    get_torch_version,
-    is_flax_available,
-    is_mlx_available,
-    is_tf_available,
-    is_torch_available,
-    is_torch_fx_proxy,
-)
+from .import_utils import is_flax_available, is_tf_available, is_torch_available, is_torch_fx_proxy
 
 
 if is_flax_available():
@@ -94,8 +85,6 @@ def infer_framework_from_repr(x):
         return "jax"
     elif representation.startswith("<class 'numpy."):
         return "np"
-    elif representation.startswith("<class 'mlx."):
-        return "mlx"
 
 
 def _get_frameworks_and_test_func(x):
@@ -108,7 +97,6 @@ def _get_frameworks_and_test_func(x):
         "tf": is_tf_tensor,
         "jax": is_jax_tensor,
         "np": is_numpy_array,
-        "mlx": is_mlx_array,
     }
     preferred_framework = infer_framework_from_repr(x)
     # We will test this one first, then numpy, then the others.
@@ -121,8 +109,8 @@ def _get_frameworks_and_test_func(x):
 
 def is_tensor(x):
     """
-    Tests if `x` is a `torch.Tensor`, `tf.Tensor`, `jaxlib.xla_extension.DeviceArray`, `np.ndarray` or `mlx.array`
-    in the order defined by `infer_framework_from_repr`
+    Tests if `x` is a `torch.Tensor`, `tf.Tensor`, `jaxlib.xla_extension.DeviceArray` or `np.ndarray` in the order
+    defined by `infer_framework_from_repr`
     """
     # This gives us a smart order to test the frameworks with the corresponding tests.
     framework_to_test_func = _get_frameworks_and_test_func(x)
@@ -241,19 +229,6 @@ def is_jax_tensor(x):
     return False if not is_flax_available() else _is_jax(x)
 
 
-def _is_mlx(x):
-    import mlx.core as mx
-
-    return isinstance(x, mx.array)
-
-
-def is_mlx_array(x):
-    """
-    Tests if `x` is a mlx array or not. Safe to call even when mlx is not installed.
-    """
-    return False if not is_mlx_available() else _is_mlx(x)
-
-
 def to_py_obj(obj):
     """
     Convert a TensorFlow tensor, PyTorch tensor, Numpy array or python list to a python list.
@@ -331,19 +306,11 @@ class ModelOutput(OrderedDict):
         `static_graph=True` with modules that output `ModelOutput` subclasses.
         """
         if is_torch_available():
-            if version.parse(get_torch_version()) >= version.parse("2.2"):
-                _torch_pytree.register_pytree_node(
-                    cls,
-                    _model_output_flatten,
-                    partial(_model_output_unflatten, output_type=cls),
-                    serialized_type_name=f"{cls.__module__}.{cls.__name__}",
-                )
-            else:
-                _torch_pytree._register_pytree_node(
-                    cls,
-                    _model_output_flatten,
-                    partial(_model_output_unflatten, output_type=cls),
-                )
+            _torch_pytree._register_pytree_node(
+                cls,
+                _model_output_flatten,
+                _model_output_unflatten,
+            )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -465,28 +432,17 @@ if is_torch_available():
     import torch.utils._pytree as _torch_pytree
 
     def _model_output_flatten(output: ModelOutput) -> Tuple[List[Any], "_torch_pytree.Context"]:
-        return list(output.values()), list(output.keys())
+        return list(output.values()), (type(output), list(output.keys()))
 
-    def _model_output_unflatten(
-        values: Iterable[Any],
-        context: "_torch_pytree.Context",
-        output_type=None,
-    ) -> ModelOutput:
-        return output_type(**dict(zip(context, values)))
+    def _model_output_unflatten(values: Iterable[Any], context: "_torch_pytree.Context") -> ModelOutput:
+        output_type, keys = context
+        return output_type(**dict(zip(keys, values)))
 
-    if version.parse(get_torch_version()) >= version.parse("2.2"):
-        _torch_pytree.register_pytree_node(
-            ModelOutput,
-            _model_output_flatten,
-            partial(_model_output_unflatten, output_type=ModelOutput),
-            serialized_type_name=f"{ModelOutput.__module__}.{ModelOutput.__name__}",
-        )
-    else:
-        _torch_pytree._register_pytree_node(
-            ModelOutput,
-            _model_output_flatten,
-            partial(_model_output_unflatten, output_type=ModelOutput),
-        )
+    _torch_pytree._register_pytree_node(
+        ModelOutput,
+        _model_output_flatten,
+        _model_output_unflatten,
+    )
 
 
 class ExplicitEnum(str, Enum):
@@ -522,7 +478,6 @@ class TensorType(ExplicitEnum):
     TENSORFLOW = "tf"
     NUMPY = "np"
     JAX = "jax"
-    MLX = "mlx"
 
 
 class ContextManagers:
@@ -701,7 +656,7 @@ def tensor_size(array):
     elif is_jax_tensor(array):
         return array.size
     else:
-        raise ValueError(f"Type not supported for tensor_size: {type(array)}.")
+        raise ValueError(f"Type not supported for expand_dims: {type(array)}.")
 
 
 def add_model_info_to_auto_map(auto_map, repo_id):

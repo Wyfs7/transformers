@@ -23,8 +23,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import WAVLM_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+WAVLM_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/wavlm-base": "https://huggingface.co/microsoft/wavlm-base/resolve/main/config.json",
+    # See all WavLM models at https://huggingface.co/models?filter=wavlm
+}
 
 
 class WavLMConfig(PretrainedConfig):

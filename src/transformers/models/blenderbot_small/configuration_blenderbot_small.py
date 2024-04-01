@@ -27,7 +27,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-from ..deprecated._archive_maps import BLENDERBOT_SMALL_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+BLENDERBOT_SMALL_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "facebook/blenderbot_small-90M": "https://huggingface.co/facebook/blenderbot_small-90M/resolve/main/config.json",
+    # See all BlenderbotSmall models at https://huggingface.co/models?filter=blenderbot_small
+}
 
 
 class BlenderbotSmallConfig(PretrainedConfig):

@@ -20,8 +20,10 @@ from ...utils import logging
 
 logger = logging.get_logger(__name__)
 
-
-from ..deprecated._archive_maps import CVT_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+CVT_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "microsoft/cvt-13": "https://huggingface.co/microsoft/cvt-13/resolve/main/config.json",
+    # See all Cvt models at https://huggingface.co/models?filter=cvt
+}
 
 
 class CvtConfig(PretrainedConfig):

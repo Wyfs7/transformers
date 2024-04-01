@@ -20,7 +20,9 @@ from ...utils import logging
 logger = logging.get_logger(__name__)
 
 
-from ..deprecated._archive_maps import UNIVNET_PRETRAINED_CONFIG_ARCHIVE_MAP  # noqa: F401, E402
+UNIVNET_PRETRAINED_CONFIG_ARCHIVE_MAP = {
+    "dg845/univnet-dev": "https://huggingface.co/dg845/univnet-dev/resolve/main/config.json",
+}
 
 
 class UnivNetConfig(PretrainedConfig):
