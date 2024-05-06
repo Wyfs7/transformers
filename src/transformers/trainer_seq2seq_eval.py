@@ -37,8 +37,8 @@ if TYPE_CHECKING:
 
 logger = logging.get_logger(__name__)
 
-
 class Seq2SeqTrainer_EVAL(Trainer):
+
     def __init__(
         self,
         model: Union["PreTrainedModel", nn.Module] = None,
@@ -147,7 +147,7 @@ class Seq2SeqTrainer_EVAL(Trainer):
             A dictionary containing the evaluation loss and the potential metrics computed from the predictions. The
             dictionary also contains the epoch number which comes from the training state.
         """
-        # import ipdb;ipdb.set_trace()
+        # import pdb;pdb.set_trace()
         gen_kwargs = gen_kwargs.copy()
 
         # Use legacy argument setting if a) the option is not explicitly passed; and b) the argument is set in the
@@ -293,9 +293,10 @@ class Seq2SeqTrainer_EVAL(Trainer):
             generation_inputs = {
                 k: v for k, v in inputs.items() if k not in ("decoder_input_ids", "decoder_attention_mask")
             }
+        # import pdb;pdb.set_trace()
         generated_tokens_raw = self.model.generate(**generation_inputs, **gen_kwargs)
         generated_tokens = generated_tokens_raw[:,generation_inputs['input_ids'].shape[-1]:]
-        # import pdb;pdb.set_trace()
+
         # Temporary hack to ensure the generation config is not initialized for each iteration of the evaluation loop
         # TODO: remove this hack when the legacy code that initializes generation_config from a model config is
         # removed in https://github.com/huggingface/transformers/blob/98d88b23f54e5a23e741833f1e973fdf600cc2c5/src/transformers/generation/utils.py#L1183
