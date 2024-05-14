@@ -3194,9 +3194,15 @@ class Trainer:
 
         observed_num_examples = 0
         # Main evaluation loop
+        
+        import datetime
         for step, inputs in enumerate(dataloader):
             # Update the observed num examples
             print('\n')
+            time2 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print("Time:")
+            print(time2)
+            print("Step:")
             print(step)
             print('\n')
             observed_batch_size = find_batch_size(inputs)
