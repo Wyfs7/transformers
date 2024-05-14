@@ -264,7 +264,6 @@ class Seq2SeqTrainer_EVAL(Trainer):
             return super().prediction_step(
                 model, inputs, prediction_loss_only=prediction_loss_only, ignore_keys=ignore_keys
             )
-
         has_labels = "labels" in inputs
         inputs = self._prepare_inputs(inputs)
 
