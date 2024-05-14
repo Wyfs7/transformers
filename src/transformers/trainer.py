@@ -447,7 +447,6 @@ class Trainer:
         self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
         self.tokenizer = tokenizer
-
         # Bnb Quantized models doesn't support `.to` operation.
         if (
             self.place_model_on_device
@@ -687,6 +686,7 @@ class Trainer:
         self.callback_handler.remove_callback(callback)
 
     def _move_model_to_device(self, model, device):
+        print(device)
         model = model.to(device)
         # Moving a model to an XLA device disconnects the tied weights, so we have to retie them.
         if self.args.parallel_mode == ParallelMode.TPU and hasattr(model, "tie_weights"):
@@ -3037,9 +3037,8 @@ class Trainer:
                 num_steps=math.ceil(output.num_samples / total_batch_size),
             )
         )
-
         self.log(output.metrics)
-
+        #print(output.metrics)
         if DebugOption.TPU_METRICS_DEBUG in self.args.debug:
             # tpu-comment: Logging debug metrics for PyTorch/XLA (compile, execute times, ops, etc.)
             xm.master_print(met.metrics_report())
@@ -3197,6 +3196,9 @@ class Trainer:
         # Main evaluation loop
         for step, inputs in enumerate(dataloader):
             # Update the observed num examples
+            print('\n')
+            print(step)
+            print('\n')
             observed_batch_size = find_batch_size(inputs)
             if observed_batch_size is not None:
                 observed_num_examples += observed_batch_size
@@ -3233,7 +3235,7 @@ class Trainer:
                     logits = self.preprocess_logits_for_metrics(logits, labels)
                 logits = self.gather_function((logits))
                 preds_host = logits if preds_host is None else nested_concat(preds_host, logits, padding_index=-100)
-            # import pdb;pdb.set_trace()
+#            import pdb;pdb.set_trace()
             if labels is not None:
                 labels = self.gather_function((labels))
                 labels_host = labels if labels_host is None else nested_concat(labels_host, labels, padding_index=-100)
