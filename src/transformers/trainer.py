@@ -3208,7 +3208,9 @@ class Trainer:
                 remaining_time = remaining_steps / steps_per_sec
                 logger.info(f"Step [{current_step}/{total_steps}],"
                             f'Elapsed Time: {format_time(elapsed_time)},'
-                            f'Estimated Remaining Time: {format_time(remaining_time)}')
+                            f'Estimated Remaining Time: {format_time(remaining_time)}'
+                            f'Speed: {steps_per_sec:.2f} steps/sec'
+                            )
             except:
                 pass
             
