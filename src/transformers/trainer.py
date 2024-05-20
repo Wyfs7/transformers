@@ -217,7 +217,7 @@ if TYPE_CHECKING:
 
 
 logger = logging.get_logger(__name__)
-
+#logger = logging.get_logger("DeepSpeed")
 
 # Name of the files used for checkpointing
 TRAINING_ARGS_NAME = "training_args.bin"
@@ -345,7 +345,6 @@ class Trainer:
         # memory metrics - must set up as early as possible
         self._memory_tracker = TrainerMemoryTracker(self.args.skip_memory_metrics)
         self._memory_tracker.start()
-
         # set the correct log level depending on the node
         log_level = args.get_process_log_level()
         logging.set_verbosity(log_level)
@@ -3194,17 +3193,26 @@ class Trainer:
 
         observed_num_examples = 0
         # Main evaluation loop
-        
-        import datetime
+        import time
+        def format_time(seconds):
+            return time.strftime("%H:%M:%S", time.gmtime(seconds))
+        start_time = time.time()
+        total_steps = len(dataloader)
         for step, inputs in enumerate(dataloader):
             # Update the observed num examples
-            print('\n')
-            time2 = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print("Time:")
-            print(time2)
-            print("Step:")
-            print(step)
-            print('\n')
+            try:
+                current_step=step
+                elapsed_time = time.time() - start_time
+                steps_per_sec = current_step / elapsed_time
+                remaining_steps = total_steps - current_step
+                remaining_time = remaining_steps / steps_per_sec
+                logger.info(f"Step [{current_step}/{total_steps}],"
+                            f'Elapsed Time: {format_time(elapsed_time)},'
+                            f'Estimated Remaining Time: {format_time(remaining_time)}')
+            except:
+                pass
+            
+            
             observed_batch_size = find_batch_size(inputs)
             if observed_batch_size is not None:
                 observed_num_examples += observed_batch_size
@@ -3216,7 +3224,7 @@ class Trainer:
             loss, logits, labels = self.prediction_step(model, inputs, prediction_loss_only, ignore_keys=ignore_keys)
             main_input_name = getattr(self.model, "main_input_name", "input_ids")
             inputs_decode = self._prepare_input(inputs[main_input_name]) if args.include_inputs_for_metrics else None
-
+            
             if is_torch_tpu_available():
                 xm.mark_step()
 
@@ -3234,14 +3242,12 @@ class Trainer:
                     if inputs_host is None
                     else nested_concat(inputs_host, inputs_decode, padding_index=-100)
                 )
-            # import pdb;pdb.set_trace()
             if logits is not None:
                 logits = self.accelerator.pad_across_processes(logits, dim=1, pad_index=-100)
                 if self.preprocess_logits_for_metrics is not None:
                     logits = self.preprocess_logits_for_metrics(logits, labels)
                 logits = self.gather_function((logits))
                 preds_host = logits if preds_host is None else nested_concat(preds_host, logits, padding_index=-100)
-#            import pdb;pdb.set_trace()
             if labels is not None:
                 labels = self.gather_function((labels))
                 labels_host = labels if labels_host is None else nested_concat(labels_host, labels, padding_index=-100)

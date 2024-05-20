@@ -24,8 +24,9 @@ from .generation.configuration_utils import GenerationConfig
 from .integrations.deepspeed import is_deepspeed_zero3_enabled
 from .trainer import Trainer
 from .utils import logging
+from transformers.trainer_callback import ProgressCallback, TrainerCallback
 
-
+from tqdm.auto import tqdm
 if TYPE_CHECKING:
     from .data.data_collator import DataCollator
     from .modeling_utils import PreTrainedModel
@@ -35,8 +36,40 @@ if TYPE_CHECKING:
     from .training_args import TrainingArguments
 
 
-logger = logging.get_logger(__name__)
+logger = logging.get_logger("DeepSpeed")
 
+class LoggerCallback(ProgressCallback):
+    def on_train_begin(self, args, state, control, **kwargs):
+        if state.is_local_process_zero and self.training_bar is None:
+            self.training_bar = tqdm(total=state.max_steps, dynamic_ncols=True)
+        self.current_step = 0
+
+    def on_step_end(self, args, state, control, **kwargs):
+        if state.is_local_process_zero and self.training_bar is not None:
+            self.training_bar.update(state.global_step - self.current_step)
+            self.current_step = state.global_step
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if state.is_local_process_zero and self.training_bar is not None:
+            _ = logs.pop("total_flos", None)
+            #print('\n tag \n')
+            elapsed = self.training_bar.format_dict['elapsed']
+            elapsed_str = self.training_bar.format_interval(elapsed)
+            rate = self.training_bar.format_dict["rate"]
+            remaining = (self.training_bar.total - self.training_bar.n) / rate if rate and self.training_bar.total else 0
+            remaining = self.training_bar.format_interval(remaining)
+            speed = 1 / rate if rate > 0 else 0
+            speed = round(speed, 2)
+            timing = f"{self.training_bar.n}/{self.training_bar.total},  " + elapsed_str + " < " + remaining + f",  {speed}s/it"
+            logs["iter"] = timing
+            log_str = ""
+            for key, value in logs.items():
+                if len(log_str) > 0:
+                    log_str += f", {key}: {value}"
+                else:
+                    log_str += f"{key}: {value}"
+            logger.info(log_str)
+            
 class Seq2SeqTrainer_EVAL(Trainer):
 
     def __init__(
@@ -66,7 +99,7 @@ class Seq2SeqTrainer_EVAL(Trainer):
             optimizers=optimizers,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         )
-
+        #self.add_callback(LoggerCallback())
         # Override self.model.generation_config if a GenerationConfig is specified in args.
         # Priority: args.generation_config > model.generation_config > default GenerationConfig.
         if self.args.generation_config is not None:
@@ -266,7 +299,6 @@ class Seq2SeqTrainer_EVAL(Trainer):
             )
         has_labels = "labels" in inputs
         inputs = self._prepare_inputs(inputs)
-
         # Priority (handled in generate):
         # non-`None` gen_kwargs > model.generation_config > default GenerationConfig()
         if len(gen_kwargs) == 0 and hasattr(self, "_gen_kwargs"):
@@ -293,9 +325,10 @@ class Seq2SeqTrainer_EVAL(Trainer):
                 k: v for k, v in inputs.items() if k not in ("decoder_input_ids", "decoder_attention_mask")
             }
         # import pdb;pdb.set_trace()
+        #print(gen_kwargs)
         generated_tokens_raw = self.model.generate(**generation_inputs, **gen_kwargs)
         generated_tokens = generated_tokens_raw[:,generation_inputs['input_ids'].shape[-1]:]
-
+        logger.info(f"generated_tokens:{len(generated_tokens[0])}")
         # Temporary hack to ensure the generation config is not initialized for each iteration of the evaluation loop
         # TODO: remove this hack when the legacy code that initializes generation_config from a model config is
         # removed in https://github.com/huggingface/transformers/blob/98d88b23f54e5a23e741833f1e973fdf600cc2c5/src/transformers/generation/utils.py#L1183
