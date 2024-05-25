@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 
 #logger = logging.get_logger("DeepSpeed")
-logger = logging.get_logger(__name__)
+logger = logging.get_logger('transformers')
 class LoggerCallback(ProgressCallback):
     def on_train_begin(self, args, state, control, **kwargs):
         if state.is_local_process_zero and self.training_bar is None:

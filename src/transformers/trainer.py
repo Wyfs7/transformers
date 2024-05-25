@@ -1818,7 +1818,31 @@ class Trainer:
                 rng_to_sync = True
 
             step = -1
+            #import time
+            def format_time(seconds):
+                return time.strftime("%H:%M:%S", time.gmtime(seconds))
+            start_time = time.time()
+            total_steps = len(epoch_iterator)
+            
             for step, inputs in enumerate(epoch_iterator):
+                
+                try:
+                    current_step=step
+                    elapsed_time = time.time() - start_time
+                    steps_per_sec = current_step / elapsed_time
+                    time_per_step = elapsed_time / current_step
+                    remaining_steps = total_steps - current_step
+                    remaining_time = remaining_steps / steps_per_sec
+                    logger.info( f"Epoch: [{epoch}],"
+                                f"Step [{current_step}/{total_steps}],"
+                                f'Elapsed Time: {format_time(elapsed_time)},'
+                                f'Estimated Remaining Time: {format_time(remaining_time)},'
+                                f'Speed: {time_per_step:.2f} steps/sec'
+                                )
+                except:
+                    pass
+                
+                
                 total_batched_samples += 1
 
                 if self.args.include_num_input_tokens_seen:
@@ -1910,8 +1934,8 @@ class Trainer:
                     self.state.global_step += 1
                     self.state.epoch = epoch + (step + 1 + steps_skipped) / steps_in_epoch
                     #import pdb;pdb.set_trace()
-                    logger.info(f'set global step{step}')
-                    #self.control = self.callback_handler.on_step_end(args, self.state, self.control)
+                    #logger.info(f'set global step{step}')
+                    self.control = self.callback_handler.on_step_end(args, self.state, self.control)
 
                     self._maybe_log_save_evaluate(tr_loss, model, trial, epoch, ignore_keys_for_eval)
                 else:
