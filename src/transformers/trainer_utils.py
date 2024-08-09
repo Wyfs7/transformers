@@ -194,7 +194,11 @@ _re_checkpoint = re.compile(r"^" + PREFIX_CHECKPOINT_DIR + r"\-(\d+)$")
 
 
 def get_last_checkpoint(folder):
-    content = os.listdir(folder)
+    try:
+        content = os.listdir(folder)
+    except:
+        content = []
+        
     checkpoints = [
         path
         for path in content
